@@ -1,6 +1,6 @@
 <?php
 /* ----------------------------------------------------------------
-CsvController ver1.0.0
+CsvController ver1.1.0
 
 Constructor:
 	- set targetCSV Path at first parameter,and set array of column name at second parameter.
@@ -16,8 +16,12 @@ Public Method:
 	create(Array):bool
 		- Add new line.
 		
-	read(int,String):string
-		- read any line. If sepcify second parameter,then you can get value of any column.
+	read(int(option),String(option)):array
+		- gets any line. If specify second parameter,then you can get value of any column.
+			if not specify parameters or first parameter is 0,then you can get all lines.
+			
+	readLimit(int,int):array
+		-	gets the number of rows specified in the second from the rows specified in the first parameter
 		
 	update(int,String,Any):bool
 		- update value of specified column in any line.
@@ -42,7 +46,7 @@ class CsvController{
 	
 	/* -----------------------------------------
 	(VOID)SET COLUMNS
-		parameter:Array
+		parameter:array
 	----------------------------------------- */
 	private function setColumns($columns){
 		mb_convert_variables("SJIS-WIN","utf-8",$columns);
@@ -108,33 +112,57 @@ class CsvController{
 	}
 	
 	/* -----------------------------------------
-	(STRING)READ
-		1st parameter:int
-		2nd parameter:string
+	(ARRAY)READ
+		1st parameter:int(option)
+		2nd parameter:string(option)
 	----------------------------------------- */
-	public function read($id,$columnName=""){
-		if($id<=$this->count()){
-			if($columnName!=""){
-				if(array_search($columnName,$this->columns)!==false){
-					$i=array_search($columnName,$this->columns);
-					foreach($this->arrys as $index=>$value){
-						if($index==$id){
-							$elements=explode(",",$value);
-							return $elements[$i];
+	public function read($id=0,$columnName=""){
+		if($id==0){
+			$i=0;
+			$results=array();
+			foreach($this->arrys as $value){
+				if($i){array_push($results,$value);}
+				$i++;
+			}
+			return $results;
+		}else{
+			if($id<=$this->count()){
+				if($columnName!=""){
+					if(array_search($columnName,$this->columns)!==false){
+						$i=array_search($columnName,$this->columns);
+						foreach($this->arrys as $index=>$value){
+							if($index==$id){
+								$elements=explode(",",$value);
+								return array($elements[$i]);
+							}
 						}
 					}
-				}
-				return null;	
-			}else{
-				foreach($this->arrys as $index=>$value){
-					if($index==$id){
-						return $value;
+					return array();	
+				}else{
+					foreach($this->arrys as $index=>$value){
+						if($index==$id){
+							return array($value);
+						}
 					}
-				}
-				return null;
-			}		
+					return array();
+				}		
+			}
+			return array();
 		}
-		return null;
+	}
+	
+	/* -----------------------------------------
+	(ARRAY)READ LIMIT
+		1st parameter:int
+		2nd parameter:int
+	----------------------------------------- */
+	public function readLimit($startRow=1,$getRowCount){
+		$lastRowCount=$this->count()<$startRow+$getRowCount ? $startRow+$this->count() : $startRow+$getRowCount;
+		$results=array();
+		for($i=$startRow;$i<$lastRowCount;$i++){
+			array_push($results,$this->arrys[$i]);
+		}
+		return $results;
 	}
 	
 	/* -----------------------------------------
@@ -176,7 +204,7 @@ class CsvController{
 	
 	/* -----------------------------------------
 	(BOOL)DELETE
-		parameter: int
+		parameter:int
 	----------------------------------------- */
 	public function delete($id){
 		if($id<=$this->count()){

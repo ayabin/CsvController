@@ -1,10 +1,15 @@
 <?php
 require_once('config.php');
+require_once('CsvController.class.php');
 
-$tagetCSV=__DIR__."/".DATA_PATH.DATA_CSV_NAME;
-if(file_exists($tagetCSV)){
-	$arrys=file($tagetCSV);
+$targetCSV=__DIR__."/".DATA_PATH.DATA_CSV_NAME;
+if(file_exists($targetCSV)){
+	$cc=new CsvController($targetCSV,COLUMN_NAMES);
+	$arrys=$cc->read();
 	mb_convert_variables("utf-8","SJIS-WIN",$arrys);
+	
+	$limits=$cc->readLimit(2,4);
+	mb_convert_variables("utf-8","SJIS-WIN",$limits);
 }
 ?>
 <!doctype html>
@@ -17,7 +22,7 @@ if(file_exists($tagetCSV)){
 			border:solid #ccc 1px;
 			border-collapse: collapse;
 			padding: 10px;
-			margin-top:40px;
+			margin-bottom:10px;
 		}
 		form{
 			border:solid #ccc 1px;
@@ -60,10 +65,29 @@ if(file_exists($tagetCSV)){
 			<label>id:<input type="text" name="id"></label>
 			<input type="submit" value="delete">
 		</form>
+		<h5>read()</h5>
 		<table>
 			<?php
-			$i=0;
+			$i=1;
 			foreach($arrys as $index=>$arry):
+			?>
+			<?php $elems=explode(",",$arry); ?>
+			<tr>
+				<td><?=$i ?></td>
+				<?php foreach($elems as $col=>$value): ?>
+				<td><?=$value ?></td>
+				<?php endforeach ?>
+			</tr>
+			<?php
+			$i++;
+			endforeach
+			?>
+		</table>
+		<h5>readLimit(2,4)</h5>
+		<table>
+			<?php
+			$i=1;
+			foreach($limits as $index=>$arry):
 			?>
 			<?php $elems=explode(",",$arry); ?>
 			<tr>
