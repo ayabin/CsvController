@@ -1,4 +1,4 @@
-## CsvController ver1.0.0
+## CsvController ver1.1.0
 
 ### Constructor:
 	- set targetCSV Path at first parameter,and set array of column name at second parameter.
@@ -15,8 +15,12 @@
 		- Add new line.
 		
 	read(int,String):string
-		- read any line. If sepcify second parameter,then you can get value of any column.
-		
+		- gets any line. If specify second parameter,then you can get value of any column.
+		- if not specify parameters or first parameter is 0,then you can get all lines.
+	
+	readLimit(int,int):array
+		- gets the number of rows specified in the second from the rows specified in the first parameter.
+	
 	update(int,String,Any):bool
 		- update value of specified column in any line.
 		
