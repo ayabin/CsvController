@@ -1,6 +1,6 @@
 <?php
 /* ----------------------------------------------------------------
-CsvController ver1.1.0
+CsvController ver1.1.1
 
 Constructor:
 	- set targetCSV Path at first parameter,and set array of column name at second parameter.
@@ -18,10 +18,10 @@ Public Method:
 		
 	read(int(option),String(option)):array
 		- gets any line. If specify second parameter,then you can get value of any column.
-			if not specify parameters or first parameter is 0,then you can get all lines.
+		- if not specify parameters or first parameter is 0,then you can get all lines.
 			
 	readLimit(int,int):array
-		-	gets the number of rows specified in the second from the rows specified in the first parameter
+		-	gets the number of rows specified in the second from the rows specified in the first parameter.
 		
 	update(int,String,Any):bool
 		- update value of specified column in any line.
@@ -41,7 +41,7 @@ class CsvController{
 			$this->arrys=file($this->targetCSV);
 		}
 		$this->columns=$columns;
-		$this->setColumns($columns);
+		$this->setColumns($this->columns);
 	}
 	
 	/* -----------------------------------------
@@ -51,9 +51,10 @@ class CsvController{
 	private function setColumns($columns){
 		mb_convert_variables("SJIS-WIN","utf-8",$columns);
 		if(!file_exists($this->targetCSV)){
+			$results=implode(",",$columns)."\n";
 			$fh=fopen($this->targetCSV,"w");
 			flock($fh,LOCK_EX);
-			fputcsv($fh,$columns);
+			fputs($fh,$results);
 			flock($fh,LOCK_UN);
 			fclose($fh);
 		}else{
@@ -157,7 +158,7 @@ class CsvController{
 		2nd parameter:int
 	----------------------------------------- */
 	public function readLimit($startRow=1,$getRowCount){
-		$lastRowCount=$this->count()<$startRow+$getRowCount ? $startRow+$this->count() : $startRow+$getRowCount;
+		$lastRowCount=$this->count()<$startRow+$getRowCount ? $this->count()+1 : $startRow+$getRowCount;
 		$results=array();
 		for($i=$startRow;$i<$lastRowCount;$i++){
 			array_push($results,$this->arrys[$i]);
