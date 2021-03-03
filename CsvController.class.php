@@ -1,15 +1,14 @@
 <?php
 /* ----------------------------------------------------------------
-CsvController ver1.1.1
+CsvController ver1.2.0
 
 Constructor:
 	- set targetCSV Path at first parameter,and set array of column name at second parameter.
 	
-Private Method:
+Public Method:
 	setColumns(Array):void
 		- set column at firstLine in targetCSV.
-
-Public Method:
+		
 	count(Bool):int
 		- count all lines in targetCSV.if parameter is true,then count all lines include first line.
 		
@@ -41,45 +40,21 @@ class CsvController{
 			$this->arrys=file($this->targetCSV);
 		}
 		$this->columns=$columns;
-		$this->setColumns($this->columns);
 	}
 	
 	/* -----------------------------------------
 	(VOID)SET COLUMNS
 		parameter:array
 	----------------------------------------- */
-	private function setColumns($columns){
-		mb_convert_variables("SJIS-WIN","utf-8",$columns);
+	public function setColumns(){
+		mb_convert_variables("SJIS-WIN","utf-8",$this->columns);
 		if(!file_exists($this->targetCSV)){
-			$results=implode(",",$columns)."\n";
+			$results=implode(",",$this->columns)."\n";
 			$fh=fopen($this->targetCSV,"w");
 			flock($fh,LOCK_EX);
 			fputs($fh,$results);
 			flock($fh,LOCK_UN);
 			fclose($fh);
-		}else{
-			$isSetable=false;
-			$firstLines=explode(",",$this->arrys[0]);
-			foreach($firstLines as $index=>$value){
-				if(str_replace("\n","",$value)!=$columns[$index]){
-					$isSetable=true;
-				}
-			}
-			if($isSetable){
-				$results=implode(",",$columns)."\n";
-				foreach($this->arrys as $value){
-					$results.=$value;
-				}
-				try{
-					$fh=fopen($this->targetCSV,"w");
-					flock($fh,LOCK_EX);
-					fputs($fh,$results);
-					flock($fh,LOCK_UN);
-					fclose($fh);
-				}catch(Exception $error){
-					echo $error->getMessage();
-				}
-			}
 		}
 	}
 	
