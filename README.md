@@ -1,4 +1,4 @@
-## CsvController ver1.1.0
+## CsvController ver1.2.0
 
 ### Constructor:
 	- set targetCSV Path at first parameter,and set array of column name at second parameter.
